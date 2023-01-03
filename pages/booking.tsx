@@ -13,19 +13,17 @@ function Booking() {
   const [isDeatail, setIsDeatail] = useState(false);
 
   const koDtf = new Intl.DateTimeFormat('ko', { dateStyle: 'long' });
-  const ClickDay = (value: Date, event) => {
+  function ClickDay<T>(value: Date, event: T): void {
     const ctToday = koDtf.format(new Date());
     const ctValue = koDtf.format(new Date(value));
-    console.log(ctToday, ctValue, 'ct');
     if (ctToday === ctValue) {
       // 날짜 디테일 페이지로 이동
       setToday(value);
       setIsDeatail(true);
     } else {
-      console.log(typeof value, value);
       setToday(value);
     }
-  };
+  }
   const goCalendar = () => setIsDeatail(false);
 
   return (

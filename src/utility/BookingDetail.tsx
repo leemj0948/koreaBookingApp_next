@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { BsFillXCircleFill } from 'react-icons/bs';
 
 interface propsType {
-  today: string;
+  today: Date | object;
   goCalendar: () => void;
 }
 
@@ -24,7 +24,7 @@ const BookingDetail = (props: propsType) => {
   ];
   const [schedules, setSchedules] = useState(schedule);
 
-  const changeDate = (todays: string): string => {
+  const changeDate = (todays: object | Date): string => {
     const customMonth = new Intl.DateTimeFormat('en', { month: 'long' }).format(new Date(todays));
     const customDay = new Intl.DateTimeFormat('ko', { day: 'numeric' }).format(new Date(todays));
     return `${customMonth}. ${customDay}`;
