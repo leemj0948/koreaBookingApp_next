@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { BsFillXCircleFill } from 'react-icons/bs';
 
@@ -10,7 +10,6 @@ interface propsType {
 
 const BookingDetail = (props: propsType) => {
   const { today, goCalendar } = props;
-  console.log(today, 'pro', props);
   const schedule = [
     { time: '09am - 10am', isClass: false },
     { time: '10am - 11am', isClass: false },
@@ -24,7 +23,6 @@ const BookingDetail = (props: propsType) => {
     { time: '6pm - 7pm', isClass: false },
   ];
   const [schedules, setSchedules] = useState(schedule);
-  const [headDate, setHeadDate] = useState('');
 
   const changeDate = (todays: string): string => {
     const customMonth = new Intl.DateTimeFormat('en', { month: 'long' }).format(new Date(todays));
@@ -36,7 +34,7 @@ const BookingDetail = (props: propsType) => {
     let schaduleData = schedules[timeIdx];
     const shadulesCopy = [...schedules];
 
-    if (schaduleData.isClass) {
+    if (schaduleData?.isClass) {
       if (window.confirm('수업을 취소하겠습니까?')) {
         schaduleData = { ...schaduleData, isClass: false };
         shadulesCopy[timeIdx] = schaduleData;
@@ -50,10 +48,6 @@ const BookingDetail = (props: propsType) => {
 
     return setSchedules(shadulesCopy);
   };
-  useEffect(() => {
-    console.log(today);
-    setHeadDate(changeDate(today));
-  }, []);
 
   return (
     <Wapper>
@@ -61,7 +55,7 @@ const BookingDetail = (props: propsType) => {
         <BsFillXCircleFill onClick={() => goCalendar()} />
       </GoBack>
 
-      <SelectDate>{headDate}</SelectDate>
+      <SelectDate>{changeDate(today)}</SelectDate>
       <DayDetail>
         {schedules[0] &&
           schedules.map((list, idx) => {
@@ -77,6 +71,7 @@ const BookingDetail = (props: propsType) => {
   );
 };
 export default BookingDetail;
+
 const Wapper = styled.section`
   display: flex;
   flex-direction: column;
@@ -92,8 +87,9 @@ const GoBack = styled.div`
   }
 `;
 const SelectDate = styled.h1`
+  padding: 20px 0;
   color: #7fdfab;
-  size: 32px;
+  font-size: 32px;
 `;
 const DayDetail = styled.div`
   display: flex;
@@ -104,12 +100,12 @@ const DayDetail = styled.div`
 const TimeSet = styled.div`
   display: flex;
   justify-content: space-around;
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
 `;
 const HourChart = styled.div`
   width: 100px;
   color: #7fdfab;
-  size: 14px;
+  font-size: 14px;
   text-align: left;
 `;
 const ActiveChart = styled.div`

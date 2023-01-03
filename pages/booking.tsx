@@ -9,7 +9,7 @@ import BookingDetail from '@src/utility/BookingDetail';
 
 function Booking() {
   const [value, setValue] = useState(new Date());
-  const [today, setToday] = useState('');
+  const [today, setToday] = useState({});
   const [isDeatail, setIsDeatail] = useState(false);
 
   const koDtf = new Intl.DateTimeFormat('ko', { dateStyle: 'long' });
@@ -19,10 +19,11 @@ function Booking() {
     console.log(ctToday, ctValue, 'ct');
     if (ctToday === ctValue) {
       // 날짜 디테일 페이지로 이동
+      setToday(value);
       setIsDeatail(true);
     } else {
-      console.log(ctValue);
-      setToday(ctValue);
+      console.log(typeof value, value);
+      setToday(value);
     }
   };
   const goCalendar = () => setIsDeatail(false);
