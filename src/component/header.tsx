@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useRouter } from 'next/router';
 
 //쿼리 파라미터로 제목 바꾸기
-const Header = () => {
+const Header: React.FC = () => {
   const router = useRouter();
   const pathName = router.pathname;
   const [title, setTitle] = useState('Reb Korean');
