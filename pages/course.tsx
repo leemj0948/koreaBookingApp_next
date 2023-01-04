@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-// import Modal from '../utilty/Modal';
+import CoursePayModal from '@src/component/CoursePayModal';
 
 const Course = () => {
   const [ModalSwitch, setModalSwitch] = useState(false);
-
+  const ModalOpen = (): void => {
+    setModalSwitch(true);
+  };
+  const ModalClose = (): void => {
+    setModalSwitch(false);
+  };
   const ClassDetail = [
     {
       name: 'Trial Class',
@@ -29,14 +34,14 @@ const Course = () => {
     <CardBox>
       {ClassDetail.map((list, key) => {
         return (
-          <ClassCard key={key} list={list} onClick={() => setModalSwitch(true)}>
+          <ClassCard key={key} list={list} onClick={ModalOpen}>
             <ClassName>{list.name}</ClassName>
             <Option>{list.option}</Option>
             <Detail>{list.detail}</Detail>
           </ClassCard>
         );
       })}
-      {/* {ModalSwitch && <Modal ModalClose={() => setModalSwitch(false)} />} */}
+      {ModalSwitch && <CoursePayModal onClose={ModalClose} />}
     </CardBox>
   );
 };
@@ -51,17 +56,25 @@ const ClassCard = styled.div`
   padding: 0 1rem;
   max-width: 302px;
   max-height: 180px;
+  height: 10rem;
   background-color: ${(props) => props.list.color};
   box-shadow: 0px 3px 6px #00000029;
 `;
-const ClassName = styled.h1``;
+const ClassName = styled.h1`
+  padding-top: 1rem;
+  font-size: 2.5rem;
+  font-weight: bold;
+`;
 const Option = styled.p`
   margin: 0;
   display: flex;
   justify-content: flex-end;
-  font-size: 18px;
+  font-size: 1.5rem;
   color: #93b080;
   font-weight: bolder;
 `;
-const Detail = styled.p``;
+const Detail = styled.p`
+  padding-top: 0.5rem;
+  font-size: 1.3rem;
+`;
 export default Course;
