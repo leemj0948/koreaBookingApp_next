@@ -28,7 +28,7 @@ const CoursePayModal = (props: Iprops) => {
         </BodyMain>
       </Body>
       <Footer>
-        <PayButton href="/paysuccess">Pay</PayButton>
+        <PayButton href="/pay/paySuccess">Pay</PayButton>
       </Footer>
     </Modal>
   );
