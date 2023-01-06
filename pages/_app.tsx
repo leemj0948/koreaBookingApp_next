@@ -4,6 +4,7 @@ import { RecoilRoot } from 'recoil';
 import GlobalStyle from '@src/styles/globalStyle';
 import '@src/styles/calendar.css';
 import Header from '@src/component/header';
+import Footer from '@src/component/Footer';
 
 export default function App({ Component, pageProps }: AppProps) {
   const queryClient = new QueryClient();
@@ -13,6 +14,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <GlobalStyle />
         <Header />
         <Component {...pageProps} />
+        <Footer/>
       </RecoilRoot>
     </QueryClientProvider>
   );
