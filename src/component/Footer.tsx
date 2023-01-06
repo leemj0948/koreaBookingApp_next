@@ -34,8 +34,8 @@ const IconBox = styled.div`
   width: 100%;
   color: #ffffff;
   svg {
-    height: 1.5em;
-    width: 1.25em;
+    height: 2.5em;
+    width: 2.25em;
   }
   .menu-icon {
     size: 24px;
