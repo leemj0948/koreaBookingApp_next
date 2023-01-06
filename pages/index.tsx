@@ -1,7 +1,9 @@
 import Head from 'next/head';
+import React from 'react';
 import styled from 'styled-components';
+import Link from 'next/link';
 
-function Home() {
+const Home: React.FC = () => {
   return (
     <div>
       <Head>
@@ -12,7 +14,6 @@ function Home() {
         <BackgroundImg>
           <Title>I am here to help you guys.</Title>
           <NextButton href="/course">
-            <li>Course</li>
             <ArrowContainer>
               <ArrowHead />
               <ArrowTail />
@@ -22,7 +23,7 @@ function Home() {
       </MainBody>
     </div>
   );
-}
+};
 
 export default Home;
 
@@ -44,20 +45,14 @@ const Title = styled.p`
   text-align: center;
   color: #ffffff;
 `;
-const NextButton = styled.a`
-  padding-top: 260px;
-  li {
-    margin: 0;
-    position: absolute;
-    right: 105px;
-    color: white;
-  }
+const NextButton = styled(Link)`
+  position: relative;
+  top: 45%;
 `;
 const ArrowContainer = styled.div`
   position: relative;
   width: 65px;
   height: 65px;
-  top: 45%;
   left: 65%;
   transform: rotate(136deg);
 `;
