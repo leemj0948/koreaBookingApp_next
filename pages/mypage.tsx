@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-// import ScheduleCardList from '../utilty/ScheduleCardList';
+import ScheduleCardList from '@src/utility/ScheduleCardList';
 
 const MyPage = () => {
   return (
@@ -21,7 +21,7 @@ const MyPage = () => {
         </ProfileText>
       </Profile>
       <h1 className="booking_list">Booking List</h1>
-      {/* <ScheduleCardList /> */}
+      <ScheduleCardList/>
     </BodyZone>
   );
 };
