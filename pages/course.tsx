@@ -2,7 +2,14 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import CoursePayModal from '@src/component/CoursePayModal';
 
-const Course = () => {
+interface ClassList {
+  name: string,
+  option:string,
+  color:string,
+  detail:string
+}
+
+const Course = ()=> {
   const [ModalSwitch, setModalSwitch] = useState(false);
   const ModalOpen = (): void => {
     setModalSwitch(true);
@@ -10,7 +17,7 @@ const Course = () => {
   const ModalClose = (): void => {
     setModalSwitch(false);
   };
-  const ClassDetail = [
+  const ClassDetail:ClassList[] = [
     {
       name: 'Trial Class',
       option: '$3 / 25 min',
