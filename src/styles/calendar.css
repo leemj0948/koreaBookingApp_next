@@ -1,7 +1,6 @@
 .calendar_packed {
-    margin: 1.5rem auto;
-    padding-top: 5rem;
-    height: 527px;
+    padding-top: 6.5rem;
+    height: 542px;
   }
   /* 전체 달력 스타일 */
   .react-calendar {

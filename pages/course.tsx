@@ -57,6 +57,7 @@ const CardBox = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 1rem 2rem;
+  height:542px;
 `;
 const ClassCard = styled.div`
   margin: 1rem 0;
