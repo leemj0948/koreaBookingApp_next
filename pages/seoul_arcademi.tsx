@@ -3,6 +3,11 @@ import styled from 'styled-components';
 import CoursePayModal from '@src/component/CoursePayModal';
 import axios,{ AxiosResponse }  from 'axios';
 import { useInfiniteQuery } from 'react-query';
+import { zzimState } from '@src/store/store';
+import { useRecoilState } from 'recoil';
+
+//react icons 
+import { AiOutlineHeart, AiFillHeart} from "react-icons/ai";
 
 interface arcademiDataList{
 charge: string;
@@ -30,13 +35,31 @@ interface Data{
 
 const Course = ()=> {
   const [ModalSwitch, setModalSwitch] = useState(false);
-  const [arcademiList,setArcademiList]= useState([]);
+  const [selectZzim,setSelectZzim] = useRecoilState(zzimState);
+
   const ModalOpen = (): void => {
     setModalSwitch(true);
   };
   const ModalClose = (): void => {
     setModalSwitch(false);
   };
+const ZzimBtnChanger = (selectItem:arcademiDataList) =>{
+  let target = selectZzim.filter(ZzimItem => ZzimItem.title===selectItem.title);
+  if(target.length){
+    return (<AiFillHeart/>)
+  }else{
+    return (<AiOutlineHeart/>)
+  }
+}
+const ZzimBtnClick= (item:arcademiDataList) =>{
+  let target = selectZzim.filter(ZzimItem => ZzimItem.title===item.title);
+  if(target.length){
+    return confirm('이미 찜하기 리스트에 있습니다. 취소하시겠습니까?')
+  }else{
+    setSelectZzim([item,...selectZzim])
+    return alert('찜리스트에 추가되었습니다.')
+  }
+}
 const zeroChecker = (item:string):string =>{
   let target = item.split(' ')[1];
   return target?item:`${item} 0`
@@ -73,7 +96,10 @@ if(InfinityRes.data){
                   return (
                     
                     <ClassCard key={key} onClick={ModalOpen}>
-                      <ClassName>{list.title}</ClassName>
+                      <ClassName>
+                        <p>{list.title}</p> 
+                        <ZzimBtn onClick={ZzimBtnClick}>{ZzimBtnChanger(list)}</ZzimBtn>
+                      </ClassName>
                       <Charge>{new Intl.NumberFormat('ko-KR',{style:'currency',currency:'KRW'}).format(Number(list.charge))} 원</Charge>
                       <ClassInfo>
                         <Teaching>강사 : {list.person}</Teaching>
@@ -114,8 +140,15 @@ const ClassCard = styled.div`
   max-height: 180px;
   height: auto;
   box-shadow: 0px 3px 6px #00000029;
+
+
 `;
-const ClassName = styled.h1`
+const ZzimBtn = styled.span`
+color:red;
+`;
+const ClassName = styled.div`
+  display: flex;
+  justify-content: space-around;
   padding-top: 1rem;
   font-size: 1.75rem;
   font-weight: bold;
