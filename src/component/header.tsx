@@ -21,6 +21,8 @@ const Header: React.FC = () => {
       case '/booking':
         titleName = 'Booking';
         break;
+      case '/seoul_arcademi':
+        titleName='Seoul Arcademi'
       default:
         titleName;
     }

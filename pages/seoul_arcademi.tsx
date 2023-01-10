@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import CoursePayModal from '@src/component/CoursePayModal';
 import axios,{ AxiosResponse }  from 'axios';
-import { useInfiniteQuery, useQuery } from 'react-query';
-import Link from 'next/link';
+import { useInfiniteQuery } from 'react-query';
 
 interface arcademiDataList{
 charge: string;
@@ -23,7 +22,10 @@ url: string;
 }
 
 interface Data{
-    item:arcademiDataList[];
+    items:{item:arcademiDataList[]};
+    numOfRows:string;
+    pageNo:string;
+    totalCount:string;
 }
 
 const Course = ()=> {
@@ -35,23 +37,11 @@ const Course = ()=> {
   const ModalClose = (): void => {
     setModalSwitch(false);
   };
-// const getDateList = async ():Promise<AxiosResponse<Data>>=>{
-//   const ServiceKeyCode = 'c671764f-6502-411a-b69f-74775d1d6e39'
-//   const res = await axios.get('http://api.kcisa.kr/openapi/service/rest/meta2020/getSACAacademy',{
-//     params:{
-//       serviceKey:ServiceKeyCode,
-//       numOfRows:10,
-//       pageNo:1
-//     }
-//   })
-//   console.log(res.data.response.body.items)
-//   return res.data.response.body.items
-// }
 const zeroChecker = (item:string):string =>{
   let target = item.split(' ')[1];
   return target?item:`${item} 0`
 }
-const getData = async ({pageParam = 1})=>{
+const getData = async ({pageParam = 1}):Promise<AxiosResponse<Data>>=>{
   const ServiceKeyCode = 'c671764f-6502-411a-b69f-74775d1d6e39'
   const res = await axios.get('http://api.kcisa.kr/openapi/service/rest/meta2020/getSACAacademy',{
     params:{
@@ -60,20 +50,19 @@ const getData = async ({pageParam = 1})=>{
       pageNo:pageParam
     }
   })
-  console.log(res,pageParam);
   return res.data.response.body
 }
 const InfinityRes = useInfiniteQuery('List',getData,{getNextPageParam:(lastPage,allPages)=>{
   return Number(lastPage.pageNo)+1
-}});
-// const res = useQuery('DataList',getDateList)
+},
+staleTime:10000,
+});
 
 if(InfinityRes.isLoading){
     return (<div>Loading...</div>)
 }
 
 if(InfinityRes.data){
-   console.log(InfinityRes.data.pages,'InfinityRes');
   
     return (
         <CardBox>
@@ -104,8 +93,8 @@ if(InfinityRes.data){
               )
             
               )})}
-                {ModalSwitch && <CoursePayModal onClose={ModalClose} />}
-              <NextBTN onClick={()=>InfinityRes.fetchNextPage()}>Next</NextBTN>
+                {ModalSwitch && <CoursePayModal onClose={ModalClose} otherClass={true}/>}
+              <NextBTN onClick={()=>InfinityRes.hasNextPage && InfinityRes.fetchNextPage()}>Next</NextBTN>
           </CardBox>
             )
             }};

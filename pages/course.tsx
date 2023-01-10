@@ -10,45 +10,16 @@ interface ClassList {
   color:string,
   detail:string
 }
-interface arcademiDataList{
-charge: string;
-collectionDb: string;
-creator: string;
-description:string;
-grade: string;
-person: string;
-publisher: string;
-regDate: string;
-spatialCoverage: string;
-state: string;
-subDescription: string;
-temporalCoverage: string;
-title: string;
-url: string;
-}
+
 
 const Course = ()=> {
   const [ModalSwitch, setModalSwitch] = useState(false);
-  const [arcademiList,setArcademiList]= useState([]);
   const ModalOpen = (): void => {
     setModalSwitch(true);
   };
   const ModalClose = (): void => {
     setModalSwitch(false);
   };
-const getDateList = async ():Promise<AxiosResponse<arcademiDataList>>=>{
-  const ServiceKeyCode = 'c671764f-6502-411a-b69f-74775d1d6e39'
-  const res = await axios.get('http://api.kcisa.kr/openapi/service/rest/meta2020/getSACAacademy',{
-    params:{
-      serviceKey:ServiceKeyCode,
-      numOfRows:10,
-      pageNo:1
-    }
-  })
-  console.log(res.data.response.body.items)
-  return res.data.response.body.items
-}
-const res = useQuery('DataList',getDateList)
 
   const ClassDetail:ClassList[] = [
     {
