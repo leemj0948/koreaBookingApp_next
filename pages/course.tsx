@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import CoursePayModal from '@src/component/CoursePayModal';
+import axios,{ AxiosResponse }  from 'axios';
+import { useQuery } from 'react-query';
 
 interface ClassList {
   name: string,
@@ -8,6 +10,7 @@ interface ClassList {
   color:string,
   detail:string
 }
+
 
 const Course = ()=> {
   const [ModalSwitch, setModalSwitch] = useState(false);
@@ -17,6 +20,7 @@ const Course = ()=> {
   const ModalClose = (): void => {
     setModalSwitch(false);
   };
+
   const ClassDetail:ClassList[] = [
     {
       name: 'Trial Class',
