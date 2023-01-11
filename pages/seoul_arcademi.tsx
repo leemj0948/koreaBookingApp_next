@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import CoursePayModal from '@src/component/CoursePayModal';
 import axios,{ AxiosResponse }  from 'axios';
-import { useInfiniteQuery } from 'react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
 import { zzimState } from '@src/store/store';
 import { useRecoilState } from 'recoil';
 
@@ -24,6 +24,7 @@ subDescription: string;
 temporalCoverage: string;
 title: string;
 url: string;
+isZzim?:boolean;
 }
 
 interface Data{
@@ -35,7 +36,10 @@ interface Data{
 
 const Course = ()=> {
   const [ModalSwitch, setModalSwitch] = useState(false);
+  const [classList,setClassList]= useState([]);
   const [selectZzim,setSelectZzim] = useRecoilState(zzimState);
+
+  const queryClient = useQueryClient();
 
   const ModalOpen = (): void => {
     setModalSwitch(true);
@@ -43,22 +47,32 @@ const Course = ()=> {
   const ModalClose = (): void => {
     setModalSwitch(false);
   };
-const ZzimBtnChanger = (selectItem:arcademiDataList) =>{
-  let target = selectZzim.filter(ZzimItem => ZzimItem.title===selectItem.title);
-  if(target.length){
-    return (<AiFillHeart/>)
-  }else{
-    return (<AiOutlineHeart/>)
+const ZzimBtnClick= (e:React.MouseEvent,list) =>{
+  e.stopPropagation();
+ 
+  console.log(queryClient)
+  const mu = useMutation('List',{
+    onSuccess:(data) =>{
+      queryClient.setQueryData('Lists',(oldData)=>{
+        console.log(oldData);
+      })
+    }
   }
-}
-const ZzimBtnClick= (item:arcademiDataList) =>{
-  let target = selectZzim.filter(ZzimItem => ZzimItem.title===item.title);
-  if(target.length){
-    return confirm('이미 찜하기 리스트에 있습니다. 취소하시겠습니까?')
+  )
+  console.log(mu);
+  if(list.isZzim){
+    return list = {isZzim:false,...list}
   }else{
-    setSelectZzim([item,...selectZzim])
-    return alert('찜리스트에 추가되었습니다.')
+    return list= {isZzim:true,...list}
   }
+
+  // let target = selectZzim.filter(ZzimItem => ZzimItem.title===item.title);
+  // if(target.length){
+  //   return confirm('이미 찜하기 리스트에 있습니다. 취소하시겠습니까?')
+  // }else{
+  //   setSelectZzim([item,...selectZzim])
+  //   return alert('찜리스트에 추가되었습니다.')
+  // }
 }
 const zeroChecker = (item:string):string =>{
   let target = item.split(' ')[1];
@@ -75,30 +89,33 @@ const getData = async ({pageParam = 1}):Promise<AxiosResponse<Data>>=>{
   })
   return res.data.response.body
 }
-const InfinityRes = useInfiniteQuery('List',getData,{getNextPageParam:(lastPage,allPages)=>{
+const {isLoading,data,hasNextPage,fetchNextPage} = useInfiniteQuery('List',getData,{getNextPageParam:(lastPage,allPages)=>{
   return Number(lastPage.pageNo)+1
 },
 staleTime:10000,
 });
 
-if(InfinityRes.isLoading){
+if(isLoading){
     return (<div>Loading...</div>)
 }
 
-if(InfinityRes.data){
+if(data){
   
     return (
         <CardBox>
-          {InfinityRes.data.pages.map(
+          {data.pages.map(
             (lists) => {
+              
               return (
                 lists.items.item.map((list :arcademiDataList, key:number)=>{
+                  list['isZzim']=false;
+                  
                   return (
                     
                     <ClassCard key={key} onClick={ModalOpen}>
                       <ClassName>
                         <p>{list.title}</p> 
-                        <ZzimBtn onClick={ZzimBtnClick}>{ZzimBtnChanger(list)}</ZzimBtn>
+                        <ZzimBtn onClick={(e)=>ZzimBtnClick(e,list)}>{list.isZzim?(<AiFillHeart/>):(<AiOutlineHeart/>)}</ZzimBtn>
                       </ClassName>
                       <Charge>{new Intl.NumberFormat('ko-KR',{style:'currency',currency:'KRW'}).format(Number(list.charge))} 원</Charge>
                       <ClassInfo>
@@ -120,7 +137,7 @@ if(InfinityRes.data){
             
               )})}
                 {ModalSwitch && <CoursePayModal onClose={ModalClose} otherClass={true}/>}
-              <NextBTN onClick={()=>InfinityRes.hasNextPage && InfinityRes.fetchNextPage()}>Next</NextBTN>
+              <NextBTN onClick={()=>hasNextPage && fetchNextPage()}>Next</NextBTN>
           </CardBox>
             )
             }};
