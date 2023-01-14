@@ -1,6 +1,7 @@
+import { arcademiDataList } from "pages/seoul_arcademi";
 import { atom } from "recoil";
 
-const zzimState = atom({
+const zzimState = atom<arcademiDataList[] | []>({
     key:'zzimState',
     default:[],
 })

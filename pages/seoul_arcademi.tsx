@@ -9,7 +9,7 @@ import { useRecoilState } from 'recoil';
 //react icons 
 import { AiOutlineHeart, AiFillHeart} from "react-icons/ai";
 
-interface arcademiDataList{
+export interface arcademiDataList{
 charge: string;
 collectionDb: string;
 creator: string;
@@ -33,6 +33,17 @@ interface Data{
     pageNo:string;
     totalCount:string;
 }
+const getData = async ({pageParam = 1}):Promise<AxiosResponse<Data>>=>{
+  const ServiceKeyCode = 'c671764f-6502-411a-b69f-74775d1d6e39'
+  const res = await axios.get('http://api.kcisa.kr/openapi/service/rest/meta2020/getSACAacademy',{
+    params:{
+      serviceKey:ServiceKeyCode,
+      numOfRows:10,
+      pageNo:pageParam
+    }
+  })
+  return res.data.response.body
+}
 
 const Course = ()=> {
   const [ModalSwitch, setModalSwitch] = useState(false);
@@ -47,24 +58,16 @@ const Course = ()=> {
   const ModalClose = (): void => {
     setModalSwitch(false);
   };
-const ZzimBtnClick= (e:React.MouseEvent,list) =>{
+const ZzimBtnClick= (e:React.MouseEvent,list:arcademiDataList) =>{
+  console.log(list);
   e.stopPropagation();
- 
-  console.log(queryClient)
-  const mu = useMutation('List',{
-    onSuccess:(data) =>{
-      queryClient.setQueryData('Lists',(oldData)=>{
-        console.log(oldData);
-      })
-    }
-  }
-  )
-  console.log(mu);
-  if(list.isZzim){
-    return list = {isZzim:false,...list}
-  }else{
-    return list= {isZzim:true,...list}
-  }
+  let prevData:arcademiDataList[]|[] = selectZzim.length?[...selectZzim]:[];
+  let newData = [...prevData,list];
+  setSelectZzim(newData);
+  console.log(selectZzim,'zzim');
+  console.log(prevData,'prev')
+  console.log(newData,'new')
+
 
   // let target = selectZzim.filter(ZzimItem => ZzimItem.title===item.title);
   // if(target.length){
@@ -78,17 +81,7 @@ const zeroChecker = (item:string):string =>{
   let target = item.split(' ')[1];
   return target?item:`${item} 0`
 }
-const getData = async ({pageParam = 1}):Promise<AxiosResponse<Data>>=>{
-  const ServiceKeyCode = 'c671764f-6502-411a-b69f-74775d1d6e39'
-  const res = await axios.get('http://api.kcisa.kr/openapi/service/rest/meta2020/getSACAacademy',{
-    params:{
-      serviceKey:ServiceKeyCode,
-      numOfRows:10,
-      pageNo:pageParam
-    }
-  })
-  return res.data.response.body
-}
+
 const {isLoading,data,hasNextPage,fetchNextPage} = useInfiniteQuery('List',getData,{getNextPageParam:(lastPage,allPages)=>{
   return Number(lastPage.pageNo)+1
 },
@@ -108,7 +101,7 @@ if(data){
               
               return (
                 lists.items.item.map((list :arcademiDataList, key:number)=>{
-                  list['isZzim']=false;
+                  
                   
                   return (
                     
