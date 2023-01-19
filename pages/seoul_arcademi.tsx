@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import CoursePayModal from '@src/component/CoursePayModal';
 import axios,{ AxiosResponse }  from 'axios';
-import { useInfiniteQuery, useMutation, useQueryClient } from 'react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-query';
 import { zzimState } from '@src/store/store';
 import { useRecoilState } from 'recoil';
 
@@ -33,21 +33,30 @@ interface Data{
     pageNo:string;
     totalCount:string;
 }
-const getData = async ({pageParam = 1}):Promise<AxiosResponse<Data>>=>{
+const getData = async (pageParam = 1 as number):Promise<AxiosResponse<Data>>=>{
   const ServiceKeyCode = 'c671764f-6502-411a-b69f-74775d1d6e39'
-  const res = await axios.get('http://api.kcisa.kr/openapi/service/rest/meta2020/getSACAacademy',{
-    params:{
-      serviceKey:ServiceKeyCode,
-      numOfRows:10,
-      pageNo:pageParam
-    }
-  })
-  return res.data.response.body
+  try{
+    const res = await axios.get('http://api.kcisa.kr/openapi/service/rest/meta2020/getSACAacademy',{
+      params:{
+        serviceKey:ServiceKeyCode,
+        numOfRows:10,
+        pageNo:pageParam
+      }
+    })
+    // setClassList(classList.concat(res.data.response.body));
+    return res.data.response.body
+  } catch(e){
+    console.error(e)
+  }
+  
+  
 }
 
 const Course = ()=> {
   const [ModalSwitch, setModalSwitch] = useState(false);
   const [classList,setClassList]= useState([]);
+  const [keyList,setKeyList] = useState([1]);
+  const [page,setPage]= useState(1);
   const [selectZzim,setSelectZzim] = useRecoilState(zzimState);
 
   const queryClient = useQueryClient();
@@ -59,15 +68,8 @@ const Course = ()=> {
     setModalSwitch(false);
   };
 const ZzimBtnClick= (e:React.MouseEvent,list:arcademiDataList) =>{
-  console.log(list);
   e.stopPropagation();
-  let prevData:arcademiDataList[]|[] = selectZzim.length?[...selectZzim]:[];
-  let newData = [...prevData,list];
-  setSelectZzim(newData);
-  console.log(selectZzim,'zzim');
-  console.log(prevData,'prev')
-  console.log(newData,'new')
-
+ 
 
   // let target = selectZzim.filter(ZzimItem => ZzimItem.title===item.title);
   // if(target.length){
@@ -81,28 +83,36 @@ const zeroChecker = (item:string):string =>{
   let target = item.split(' ')[1];
   return target?item:`${item} 0`
 }
-
-const {isLoading,data,hasNextPage,fetchNextPage} = useInfiniteQuery('List',getData,{getNextPageParam:(lastPage,allPages)=>{
-  return Number(lastPage.pageNo)+1
-},
+const nextFetchBtn = () =>{
+  let prevCnt = keyList[keyList.length-1];
+  let nextCnt = prevCnt+1;
+  let newArr = [...keyList].concat([nextCnt]);
+  setPage(nextCnt);
+  return setKeyList(newArr);
+}
+const prevFetchBtn =() =>{
+  let newArr = [...keyList];
+  newArr.pop();
+  setPage(page-1);
+  setKeyList(newArr)
+}
+const {isLoading,data} = useQuery(keyList,()=>getData(page),{
 staleTime:10000,
+cacheTime: Infinity,
+keepPreviousData: true,
 });
 
 if(isLoading){
     return (<div>Loading...</div>)
 }
-
+console.log(queryClient)
 if(data){
+  console.log(data)
   
     return (
         <CardBox>
-          {data.pages.map(
-            (lists) => {
-              
-              return (
-                lists.items.item.map((list :arcademiDataList, key:number)=>{
-                  
-                  
+          {data.items?.item.map(
+            (list,key) => {
                   return (
                     
                     <ClassCard key={key} onClick={ModalOpen}>
@@ -123,14 +133,16 @@ if(data){
                         더 알아보기
                       </MoreInfo>
                     </ClassCard>
-                     )
-                    
-                  }
+                 
               )
             
-              )})}
+              })}
                 {ModalSwitch && <CoursePayModal onClose={ModalClose} otherClass={true}/>}
-              <NextBTN onClick={()=>hasNextPage && fetchNextPage()}>Next</NextBTN>
+              <DataControll>
+                <PrevBTN onClick={()=>prevFetchBtn()}>Prev</PrevBTN>
+                <NextBTN onClick={()=>nextFetchBtn()}>Next</NextBTN>
+              </DataControll>
+              
           </CardBox>
             )
             }};
@@ -204,5 +216,7 @@ const MoreInfo = styled.a`
     text-decoration: underline;
     font-size: 1.25rem;
 `;
+const DataControll = styled.div``;
+const PrevBTN = styled.button``;
 const NextBTN = styled.button``;
 export default Course;
