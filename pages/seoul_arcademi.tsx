@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import CoursePayModal from '@src/component/CoursePayModal';
 import axios,{ AxiosResponse }  from 'axios';
-import { useInfiniteQuery } from 'react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from 'react-query';
+import { zzimState } from '@src/store/store';
+import { useRecoilState } from 'recoil';
 
-interface arcademiDataList{
+//react icons 
+import { AiOutlineHeart, AiFillHeart} from "react-icons/ai";
+
+export interface arcademiDataList{
 charge: string;
 collectionDb: string;
 creator: string;
@@ -19,6 +24,7 @@ subDescription: string;
 temporalCoverage: string;
 title: string;
 url: string;
+isZzim?:boolean;
 }
 
 interface Data{
@@ -27,53 +33,105 @@ interface Data{
     pageNo:string;
     totalCount:string;
 }
+const getData = async (pageParam = 1 as number):Promise<AxiosResponse<Data>>=>{
+  const ServiceKeyCode = 'c671764f-6502-411a-b69f-74775d1d6e39'
+  try{
+    const res = await axios.get('http://api.kcisa.kr/openapi/service/rest/meta2020/getSACAacademy',{
+      params:{
+        serviceKey:ServiceKeyCode,
+        numOfRows:10,
+        pageNo:pageParam
+      }
+    })
+    return res.data.response.body
+  } catch(e){
+    console.error(e)
+  }
+  
+  
+}
 
 const Course = ()=> {
   const [ModalSwitch, setModalSwitch] = useState(false);
-  const [arcademiList,setArcademiList]= useState([]);
-  const ModalOpen = (): void => {
+  const [keyList,setKeyList] = useState([1]);
+  const [page,setPage]= useState(1);
+  const [selectZzim,setSelectZzim] = useRecoilState(zzimState);
+
+  const queryClient = useQueryClient();
+
+  const ModalOpen = useCallback((): void => {
     setModalSwitch(true);
-  };
-  const ModalClose = (): void => {
+  },[ModalSwitch])
+  const ModalClose = useCallback((): void => {
     setModalSwitch(false);
-  };
+  },[ModalSwitch])
+  const checkZzim = (title:string):Boolean =>{
+    let idx = selectZzim.findIndex(arr=>{
+      return arr.title === title
+    })
+    if(idx>-1){
+      return true
+    }else{
+      return false
+    }
+  }
+const ZzimBtnClick= useCallback((e:React.MouseEvent,list:arcademiDataList) =>{
+  e.stopPropagation();
+  let idx = selectZzim.findIndex(arr=>{
+    return arr.title === list.title
+  })
+  let newArr:arcademiDataList[]
+  if(idx>-1){
+    //있는 경우 
+    newArr = [...selectZzim];
+    newArr.splice(idx,1);
+    
+  }else{
+    newArr = [...selectZzim,list]
+  }
+  setSelectZzim(newArr);
+},[selectZzim])
 const zeroChecker = (item:string):string =>{
   let target = item.split(' ')[1];
   return target?item:`${item} 0`
 }
-const getData = async ({pageParam = 1}):Promise<AxiosResponse<Data>>=>{
-  const ServiceKeyCode = 'c671764f-6502-411a-b69f-74775d1d6e39'
-  const res = await axios.get('http://api.kcisa.kr/openapi/service/rest/meta2020/getSACAacademy',{
-    params:{
-      serviceKey:ServiceKeyCode,
-      numOfRows:10,
-      pageNo:pageParam
-    }
-  })
-  return res.data.response.body
+const nextFetchBtn = () =>{
+  let prevCnt = keyList[keyList.length-1];
+  let nextCnt = prevCnt+1;
+  let newArr = [...keyList].concat([nextCnt]);
+  setPage(nextCnt);
+  return setKeyList(newArr);
 }
-const InfinityRes = useInfiniteQuery('List',getData,{getNextPageParam:(lastPage,allPages)=>{
-  return Number(lastPage.pageNo)+1
-},
-staleTime:10000,
+const prevFetchBtn =() =>{
+  let newArr = [...keyList];
+  newArr.pop();
+  setPage(page-1);
+  setKeyList(newArr)
+}
+const {isLoading,data} = useQuery<AxiosResponse<Data>>(keyList,()=>getData(page),{
+staleTime:60000,
+cacheTime: Infinity,
+keepPreviousData: true,
 });
 
-if(InfinityRes.isLoading){
+if(isLoading){
     return (<div>Loading...</div>)
 }
-
-if(InfinityRes.data){
+console.log(queryClient)
+if(data){
+  console.log(data)
   
     return (
         <CardBox>
-          {InfinityRes.data.pages.map(
-            (lists) => {
-              return (
-                lists.items.item.map((list :arcademiDataList, key:number)=>{
+          {data.items?.item.map(
+            (list,key) => {
                   return (
                     
                     <ClassCard key={key} onClick={ModalOpen}>
-                      <ClassName>{list.title}</ClassName>
+                      <ClassName>
+                        <p>{list.title}</p> 
+                        <ZzimBtn onClick={(e)=>ZzimBtnClick(e,list)}>{checkZzim(list.title)?(<AiFillHeart/>):(<AiOutlineHeart/>)}</ZzimBtn>
+                      </ClassName>
                       <Charge>{new Intl.NumberFormat('ko-KR',{style:'currency',currency:'KRW'}).format(Number(list.charge))} 원</Charge>
                       <ClassInfo>
                         <Teaching>강사 : {list.person}</Teaching>
@@ -87,14 +145,15 @@ if(InfinityRes.data){
                         더 알아보기
                       </MoreInfo>
                     </ClassCard>
-                     )
-                    
-                  }
               )
             
-              )})}
+              })}
                 {ModalSwitch && <CoursePayModal onClose={ModalClose} otherClass={true}/>}
-              <NextBTN onClick={()=>InfinityRes.hasNextPage && InfinityRes.fetchNextPage()}>Next</NextBTN>
+              <DataControll>
+                {page>1&&<PrevBTN onClick={()=>prevFetchBtn()}>Prev</PrevBTN>}
+                {Number(data.totalCount)>page&&<NextBTN onClick={()=>nextFetchBtn()}>Next</NextBTN>}
+              </DataControll>
+              
           </CardBox>
             )
             }};
@@ -114,8 +173,15 @@ const ClassCard = styled.div`
   max-height: 180px;
   height: auto;
   box-shadow: 0px 3px 6px #00000029;
+
+
 `;
-const ClassName = styled.h1`
+const ZzimBtn = styled.span`
+color:red;
+`;
+const ClassName = styled.div`
+  display: flex;
+  justify-content: space-around;
   padding-top: 1rem;
   font-size: 1.75rem;
   font-weight: bold;
@@ -161,5 +227,7 @@ const MoreInfo = styled.a`
     text-decoration: underline;
     font-size: 1.25rem;
 `;
+const DataControll = styled.div``;
+const PrevBTN = styled.button``;
 const NextBTN = styled.button``;
 export default Course;
