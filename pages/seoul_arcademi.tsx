@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 import CoursePayModal from '@src/component/CoursePayModal';
 import axios,{ AxiosResponse }  from 'axios';
@@ -43,7 +43,6 @@ const getData = async (pageParam = 1 as number):Promise<AxiosResponse<Data>>=>{
         pageNo:pageParam
       }
     })
-    // setClassList(classList.concat(res.data.response.body));
     return res.data.response.body
   } catch(e){
     console.error(e)
@@ -54,19 +53,18 @@ const getData = async (pageParam = 1 as number):Promise<AxiosResponse<Data>>=>{
 
 const Course = ()=> {
   const [ModalSwitch, setModalSwitch] = useState(false);
-  const [classList,setClassList]= useState([]);
   const [keyList,setKeyList] = useState([1]);
   const [page,setPage]= useState(1);
   const [selectZzim,setSelectZzim] = useRecoilState(zzimState);
 
   const queryClient = useQueryClient();
 
-  const ModalOpen = (): void => {
+  const ModalOpen = useCallback((): void => {
     setModalSwitch(true);
-  };
-  const ModalClose = (): void => {
+  },[ModalSwitch])
+  const ModalClose = useCallback((): void => {
     setModalSwitch(false);
-  };
+  },[ModalSwitch])
   const checkZzim = (title:string):Boolean =>{
     let idx = selectZzim.findIndex(arr=>{
       return arr.title === title
@@ -77,7 +75,7 @@ const Course = ()=> {
       return false
     }
   }
-const ZzimBtnClick= (e:React.MouseEvent,list:arcademiDataList) =>{
+const ZzimBtnClick= useCallback((e:React.MouseEvent,list:arcademiDataList) =>{
   e.stopPropagation();
   let idx = selectZzim.findIndex(arr=>{
     return arr.title === list.title
@@ -86,13 +84,13 @@ const ZzimBtnClick= (e:React.MouseEvent,list:arcademiDataList) =>{
   if(idx>-1){
     //있는 경우 
     newArr = [...selectZzim];
-    newArr.splice(idx,0);
+    newArr.splice(idx,1);
     
   }else{
     newArr = [...selectZzim,list]
   }
   setSelectZzim(newArr);
-}
+},[selectZzim])
 const zeroChecker = (item:string):string =>{
   let target = item.split(' ')[1];
   return target?item:`${item} 0`
@@ -147,7 +145,6 @@ if(data){
                         더 알아보기
                       </MoreInfo>
                     </ClassCard>
-                 
               )
             
               })}
