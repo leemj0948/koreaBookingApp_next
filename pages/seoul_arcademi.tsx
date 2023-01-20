@@ -67,17 +67,31 @@ const Course = ()=> {
   const ModalClose = (): void => {
     setModalSwitch(false);
   };
+  const checkZzim = (title:string):Boolean =>{
+    let idx = selectZzim.findIndex(arr=>{
+      return arr.title === title
+    })
+    if(idx>-1){
+      return true
+    }else{
+      return false
+    }
+  }
 const ZzimBtnClick= (e:React.MouseEvent,list:arcademiDataList) =>{
   e.stopPropagation();
- 
-
-  // let target = selectZzim.filter(ZzimItem => ZzimItem.title===item.title);
-  // if(target.length){
-  //   return confirm('이미 찜하기 리스트에 있습니다. 취소하시겠습니까?')
-  // }else{
-  //   setSelectZzim([item,...selectZzim])
-  //   return alert('찜리스트에 추가되었습니다.')
-  // }
+  let idx = selectZzim.findIndex(arr=>{
+    return arr.title === list.title
+  })
+  let newArr:arcademiDataList[]
+  if(idx>-1){
+    //있는 경우 
+    newArr = [...selectZzim];
+    newArr.splice(idx,0);
+    
+  }else{
+    newArr = [...selectZzim,list]
+  }
+  setSelectZzim(newArr);
 }
 const zeroChecker = (item:string):string =>{
   let target = item.split(' ')[1];
@@ -96,8 +110,8 @@ const prevFetchBtn =() =>{
   setPage(page-1);
   setKeyList(newArr)
 }
-const {isLoading,data} = useQuery(keyList,()=>getData(page),{
-staleTime:10000,
+const {isLoading,data} = useQuery<AxiosResponse<Data>>(keyList,()=>getData(page),{
+staleTime:60000,
 cacheTime: Infinity,
 keepPreviousData: true,
 });
@@ -118,7 +132,7 @@ if(data){
                     <ClassCard key={key} onClick={ModalOpen}>
                       <ClassName>
                         <p>{list.title}</p> 
-                        <ZzimBtn onClick={(e)=>ZzimBtnClick(e,list)}>{list.isZzim?(<AiFillHeart/>):(<AiOutlineHeart/>)}</ZzimBtn>
+                        <ZzimBtn onClick={(e)=>ZzimBtnClick(e,list)}>{checkZzim(list.title)?(<AiFillHeart/>):(<AiOutlineHeart/>)}</ZzimBtn>
                       </ClassName>
                       <Charge>{new Intl.NumberFormat('ko-KR',{style:'currency',currency:'KRW'}).format(Number(list.charge))} 원</Charge>
                       <ClassInfo>
@@ -139,8 +153,8 @@ if(data){
               })}
                 {ModalSwitch && <CoursePayModal onClose={ModalClose} otherClass={true}/>}
               <DataControll>
-                <PrevBTN onClick={()=>prevFetchBtn()}>Prev</PrevBTN>
-                <NextBTN onClick={()=>nextFetchBtn()}>Next</NextBTN>
+                {page>1&&<PrevBTN onClick={()=>prevFetchBtn()}>Prev</PrevBTN>}
+                {Number(data.totalCount)>page&&<NextBTN onClick={()=>nextFetchBtn()}>Next</NextBTN>}
               </DataControll>
               
           </CardBox>
