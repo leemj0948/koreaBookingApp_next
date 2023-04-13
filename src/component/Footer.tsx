@@ -7,18 +7,15 @@ import { BsFillMenuButtonWideFill } from 'react-icons/bs';
 import { AiFillMail } from 'react-icons/ai';
 import { FaUserCircle } from 'react-icons/fa';
 const Footer = () => {
-    const goMypage = ():Promise<boolean> =>{
-        return (Router.push ('/mypage'));
-    }
+  const goMypage = (): Promise<boolean> => {
+    return Router.push('/mypage');
+  };
   return (
     <FooterSection>
       <IconBox>
         <BsFillMenuButtonWideFill className="menu-icon" />
         <AiFillMail className="message" />
-        <FaUserCircle
-          className="profile"
-          onClick={goMypage}
-        />
+        <FaUserCircle className="profile" onClick={goMypage} />
       </IconBox>
     </FooterSection>
   );

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const PaySuccess = ()=> {
+const PaySuccess = () => {
   return (
     <BackGround>
       <Header>Thank you</Header>
@@ -34,11 +34,10 @@ const Body = styled.div`
   height: 154px;
   font-size: 24px;
   font-family: 'Brandon Grotesque, Regular', Regular;
-  p{
+  p {
     margin-top: 2rem;
   }
   .start {
-    
     text-align: left;
   }
   .korean {

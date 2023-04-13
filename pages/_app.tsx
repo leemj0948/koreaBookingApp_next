@@ -7,22 +7,20 @@ import Header from '@src/component/header';
 import Footer from '@src/component/Footer';
 
 export default function App({ Component, pageProps }: AppProps) {
-  const queryClient = new QueryClient(
-    {
-      defaultOptions: {
-          queries: {
-              refetchOnWindowFocus: false, // window focus 설정
-          }
-      }
-  }
-  );
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false, // window focus 설정
+      },
+    },
+  });
   return (
     <QueryClientProvider client={queryClient}>
       <RecoilRoot>
         <GlobalStyle />
         <Header />
         <Component {...pageProps} />
-        <Footer/>
+        <Footer />
       </RecoilRoot>
     </QueryClientProvider>
   );

@@ -21,7 +21,7 @@ const MyPage = () => {
         </ProfileText>
       </Profile>
       <h1 className="booking_list">Booking List</h1>
-      <ScheduleCardList/>
+      <ScheduleCardList />
     </BodyZone>
   );
 };

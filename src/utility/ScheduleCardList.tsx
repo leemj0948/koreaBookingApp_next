@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 
-
 const ScheduleCardList = () => {
   const DummyClass = [
     { nth: '4th', day: 'Thr', time: '10:00am-10:50am' },
@@ -55,7 +54,7 @@ const NthCircle = styled.div`
   height: 65px;
   border-radius: 35px;
   background-color: #ffffff;
-  font-size:1.5rem;
+  font-size: 1.5rem;
   p {
     margin: 0;
   }
