@@ -8,45 +8,41 @@ import { FaWindowClose } from 'react-icons/fa';
 
 interface Iprops {
   onClose: () => void;
-  otherClass?:boolean | undefined;
-  title?:string;
-  totalPay?:string;
-
+  otherClass?: boolean | undefined;
+  title?: string;
+  totalPay?: string;
 }
-const BodyChanger = (isOtherClass=false,props:Iprops) =>{
-  if(isOtherClass){
+const BodyChanger = (isOtherClass = false, props: Iprops) => {
+  if (isOtherClass) {
     return (
       <>
-      <BodyHeader>{props.title}</BodyHeader>
-      <BodyMain>
-        <p>$15*10 class</p>
-        <p>$150.00</p>
-        <p>tax(10%)</p>
-        <p>{Number(props.totalPay)*0.1}</p>
-        <p>total</p>
-        <p>{props.totalPay}</p>
-      </BodyMain>
+        <BodyHeader>{props.title}</BodyHeader>
+        <BodyMain>
+          <p>$15*10 class</p>
+          <p>$150.00</p>
+          <p>tax(10%)</p>
+          <p>{Number(props.totalPay) * 0.1}</p>
+          <p>total</p>
+          <p>{props.totalPay}</p>
+        </BodyMain>
       </>
-      
-    )
-    
-  }else{
+    );
+  } else {
     return (
       <>
-       <BodyHeader>$ 150.00</BodyHeader>
-      <BodyMain>
-        <p>$15*10 class</p>
-        <p>$150.00</p>
-        <p>tax(10%)</p>
-        <p>$15.00</p>
-        <p>total</p>
-        <p>$165.00</p>
-      </BodyMain>
+        <BodyHeader>$ 150.00</BodyHeader>
+        <BodyMain>
+          <p>$15*10 class</p>
+          <p>$150.00</p>
+          <p>tax(10%)</p>
+          <p>$15.00</p>
+          <p>total</p>
+          <p>$165.00</p>
+        </BodyMain>
       </>
-     
-    )
+    );
   }
-}
+};
 
 const CoursePayModal = (props: Iprops) => {
   return (
@@ -54,9 +50,7 @@ const CoursePayModal = (props: Iprops) => {
       <Header>
         <FaWindowClose className="close_button" onClick={props.onClose} />
       </Header>
-      <Body>
-        {BodyChanger(props.otherClass,props)}
-      </Body>
+      <Body>{BodyChanger(props.otherClass, props)}</Body>
       <Footer>
         <PayButton href="/pay/paySuccess">Pay</PayButton>
       </Footer>

@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import CoursePayModal from '@src/component/CoursePayModal';
-import axios,{ AxiosResponse }  from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { useQuery } from 'react-query';
 
 interface ClassList {
-  name: string,
-  option:string,
-  color:string,
-  detail:string
+  name: string;
+  option: string;
+  color: string;
+  detail: string;
 }
 
-
-const Course = ()=> {
+const Course = () => {
   const [ModalSwitch, setModalSwitch] = useState(false);
   const ModalOpen = (): void => {
     setModalSwitch(true);
@@ -21,7 +20,7 @@ const Course = ()=> {
     setModalSwitch(false);
   };
 
-  const ClassDetail:ClassList[] = [
+  const ClassDetail: ClassList[] = [
     {
       name: 'Trial Class',
       option: '$3 / 25 min',
@@ -61,7 +60,7 @@ const CardBox = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 1rem 2rem;
-  height:542px;
+  height: 542px;
 `;
 const ClassCard = styled.div`
   margin: 1rem 0;
