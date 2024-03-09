@@ -33,7 +33,7 @@ interface Data {
   pageNo: string;
   totalCount: string;
 }
-const getData = async (pageParam = 1 as number): Promise<AxiosResponse<Data>> => {
+const getData = async (pageParam = 1 as number) => {
   const ServiceKeyCode = 'c671764f-6502-411a-b69f-74775d1d6e39';
   try {
     const res = await axios.get('http://api.kcisa.kr/openapi/service/rest/meta2020/getSACAacademy', {
@@ -55,31 +55,37 @@ const Course = () => {
   const [page, setPage] = useState(1);
   const [selectZzim, setSelectZzim] = useRecoilState(zzimState);
 
-  //   const { mutate } = useMutation(addTodo, {
-  // onMutate: async (newTodo) => {
-  //   await queryClient.cancelQueries("todos");
+  // post 함수 Zzim 기능 추가 useMutation 로직
+  // const postData = async (addData:arcademiDataList) =>{
+  //   const { data } = await axios.post("http://localhost:5000/list", {
+  //     addData
+  //   });
 
-  //   const previousTodos = queryClient.getQueryData<arcademiDataList[]>("todos");
+  //   return data;
+  // }
+  //   const { mutate } = useMutation(postData, {
+  // onMutate: async (newData) => {
 
-  //   queryClient.setQueryData("todos", (oldData) => {
+  //   await queryClient.cancelQueries(`${page}`);
+
+  //   const previousData = queryClient.getQueryData<arcademiDataList[]>(`${page}`);
+
+  //   queryClient.setQueryData(`${page}`, (oldData) => {
   //     if (!oldData) {
   //       return [];
   //     }
 
-  //     return [
-  //       ...oldData,
-  //       { id: oldData.length + 1, todo: newTodo, done: false },
-  //     ];
+  //     return newData;
   //   });
 
-  //   return { previousTodos };
+  //   return { previousData };
   // },
 
-  // onError: (_error, _newTodo, context) => {
-  //   queryClient.setQueryData("todos", context?.previousTodos);
+  // onError: (_error, _newData, context) => {
+  //   queryClient.setQueryData(`${page}`, context?.previousData);
   // },
   // onSettled: () => {
-  //   queryClient.invalidateQueries("todos");
+  //   queryClient.invalidateQueries(`${page}`);
   // },
   // });
 
@@ -102,9 +108,9 @@ const Course = () => {
     }
   };
   const ZzimBtnClick = useCallback(
-    (e: React.MouseEvent, list: arcademiDataList, key) => {
+    (e: React.MouseEvent, list: arcademiDataList) => {
       e.stopPropagation();
-      console.log(key);
+
       let idx = selectZzim.findIndex((arr) => {
         return arr.title === list.title;
       });
@@ -137,7 +143,7 @@ const Course = () => {
     setPage(page - 1);
     setKeyList(newArr);
   };
-  const { isLoading, data } = useQuery<AxiosResponse<Data>>(keyList, () => getData(page), {
+  const { isLoading, data } = useQuery<AxiosResponse<Data, any>>(keyList, () => getData(page), {
     staleTime: 60000,
     cacheTime: Infinity,
     keepPreviousData: true,
@@ -152,12 +158,12 @@ const Course = () => {
 
     return (
       <CardBox>
-        {data.items?.item.map((list, key) => {
+        {data.data.items?.item.map((list, key) => {
           return (
             <ClassCard key={key} onClick={ModalOpen}>
               <ClassName>
                 <p>{list.title}</p>
-                <ZzimBtn onClick={(e) => ZzimBtnClick(e, list, key)}>
+                <ZzimBtn onClick={(e) => ZzimBtnClick(e, list)}>
                   {checkZzim(list.title) ? <AiFillHeart /> : <AiOutlineHeart />}
                 </ZzimBtn>
               </ClassName>
@@ -179,7 +185,7 @@ const Course = () => {
         {ModalSwitch && <CoursePayModal onClose={ModalClose} otherClass={true} />}
         <DataControll>
           {page > 1 && <PrevBTN onClick={() => prevFetchBtn()}>Prev</PrevBTN>}
-          {Number(data.totalCount) > page && <NextBTN onClick={() => nextFetchBtn()}>Next</NextBTN>}
+          {Number(data.data.totalCount) > page && <NextBTN onClick={() => nextFetchBtn()}>Next</NextBTN>}
         </DataControll>
       </CardBox>
     );
